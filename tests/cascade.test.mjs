@@ -23,3 +23,14 @@ test("catalog keeps unverified optical parameters empty and editable", () => {
   assert.match(catalog, /verifiedAt/);
   assert.match(catalog, /insertionLossDb/);
 });
+test("supports editable wavelength and optical-class budgets", () => {
+  assert.match(cascade, /WAVELENGTHS_NM/);
+  assert.match(cascade, /OPTICAL_CLASS_BUDGET_DB/);
+  assert.match(cascade, /designMarginDb = opticalBudgetDb - lossDb/);
+});
+test("topology UI binds equipment and exports per-ONT reports", () => {
+  assert.match(planner, /optibudget\.catalog\.v1/);
+  assert.match(planner, /applyCatalog/);
+  assert.match(planner, /optibudget-ont-report\.csv/);
+  assert.match(planner, /window\.print\(\)/);
+});
