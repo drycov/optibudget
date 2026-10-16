@@ -36,14 +36,15 @@ function App() {
     <aside className="sidebar">
       <div className="brand"><div className="brand-icon"><Cable size={22}/></div><div><strong>OptiBudget</strong><span>PON engineering tools</span></div></div>
       <div className="nav-label">РАБОЧАЯ ОБЛАСТЬ</div>
-      <button className={tab === "calculator" ? "nav-item active" : "nav-item"} onClick={() => setTab("calculator")}><Activity size={18}/> Расчёт линии</button>
-      <button className={tab === "journal" ? "nav-item active" : "nav-item"} onClick={() => setTab("journal")}><Archive size={18}/> Журнал <span className="count">{journal.length}</span></button>
-      <button className={tab === "catalog" ? "nav-item active" : "nav-item"} onClick={() => setTab("catalog")}><RadioTower size={18}/> Каталог</button>
-      <button className={tab === "topology" ? "nav-item active" : "nav-item"} onClick={() => setTab("topology")}><GitBranch size={18}/> Каскад</button>
+      <button className={tab === "calculator" ? "nav-item active" : "nav-item"} onClick={() => setTab("calculator")}><Activity size={18}/><span className="nav-text">Расчёт</span></button>
+      <button className={tab === "journal" ? "nav-item active" : "nav-item"} onClick={() => setTab("journal")}><Archive size={18}/><span className="nav-text">Журнал</span><span className="count">{journal.length}</span></button>
+      <button className={tab === "catalog" ? "nav-item active" : "nav-item"} onClick={() => setTab("catalog")}><RadioTower size={18}/><span className="nav-text">Каталог</span></button>
+      <button className={tab === "topology" ? "nav-item active" : "nav-item"} onClick={() => setTab("topology")}><GitBranch size={18}/><span className="nav-text">Каскад</span></button>
       <div className="side-note">PWA · локальная работа<br/><small>Параметры MVP требуют проверки по паспортам</small></div>
     </aside>
     <main className="main">
       <header className="topbar"><div><div className="eyebrow">ОПТИЧЕСКОЕ ПРОЕКТИРОВАНИЕ / PON</div><h1>{tab === "calculator" ? "Расчёт оптического бюджета" : tab === "journal" ? "Журнал расчётов" : tab === "catalog" ? "Каталог оборудования" : "Каскадная топология"}</h1></div><span className="offline"><i/> Локальный режим</span></header>
+      <section className="mobile-summary" aria-live="polite"><div><span>Уровень RX</span><strong>{fmt(result.rxPowerDbm)} <small>dBm</small></strong></div><div><span>Потери</span><strong>{fmt(result.totalLossDb)} dB</strong></div><div className={result.withinSensitivity && result.withinOverload && result.designMarginDb >= 0 ? "mobile-summary-state good" : "mobile-summary-state warn"}>{result.status}</div></section>
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
       {tab === "calculator" && <>
         <section className="project-strip">
