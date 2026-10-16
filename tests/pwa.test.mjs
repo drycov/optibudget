@@ -12,8 +12,8 @@ test("PWA manifest declares a standalone app and valid local icons", async () =>
   assert.ok(Array.isArray(manifest.icons) && manifest.icons.length > 0);
 
   for (const icon of manifest.icons) {
-    assert.ok(icon.src.startsWith("/"), `icon must be same-origin: ${icon.src}`);
-    await read(`..${icon.src}`);
+    assert.ok(icon.src.startsWith("/"), \`icon must be same-origin: \${icon.src}\`);
+    await read(\`../public\${icon.src}\`);
   }
 });
 
