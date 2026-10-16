@@ -53,3 +53,24 @@
  .path-results>.btn{min-height:44px}
 }
 @media(max-width:380px){.node-fields{grid-template-columns:1fr}.catalog-bind{grid-column:auto}}
+
+
+/* Mobile cascade UX: fit simple chains vertically, preserve horizontal pan for branches */
+@media(max-width:760px){
+ .topology-canvas{width:100%;max-width:100%;padding:8px;border-radius:10px;overflow:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch}
+ .topology-canvas svg{display:block;max-width:none}
+ .topology-visual .panel-heading h2{font-size:16px;line-height:1.3;letter-spacing:-.2px;text-rendering:geometricPrecision;-webkit-font-smoothing:antialiased}
+ .topology-visual .panel-heading p{font-size:12px;line-height:1.55}
+ .cascade-intro h2,.cascade-workspace .panel-heading h2{filter:none;-webkit-filter:none;transform:translateZ(0);backface-visibility:hidden;text-rendering:geometricPrecision;-webkit-font-smoothing:antialiased}
+ .cascade-intro{display:grid;grid-template-columns:40px minmax(0,1fr);align-items:start;gap:10px}
+ .cascade-intro>div:nth-child(2){min-width:0;width:100%}
+ .cascade-intro>.topology-report-actions{grid-column:1/-1;margin:0;width:100%}
+ .topology-report-actions .btn{min-width:0;overflow-wrap:anywhere}
+ .topology-legend{line-height:1.5}
+ .cascade-editor .panel-heading{align-items:flex-start}
+ .cascade-editor .panel-heading>svg{flex:none}
+}
+@media(max-width:380px){
+ .topology-legend{column-gap:8px;row-gap:7px}
+ .topology-legend span{font-size:9px}
+}
