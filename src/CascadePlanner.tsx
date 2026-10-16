@@ -25,7 +25,9 @@ const readNodes = (): TopologyNode[] => {
 const nfmt = (n:number) => Number.isFinite(n) ? n.toFixed(2) : "—";
 const kinds: NodeKind[] = ["fiber","plc","fbt","splice","connector","ont"];
 export default function CascadePlanner() {
-  const [nodes,setNodes] = useState<TopologyNode[]>(readNodes);\n  const [isMobile,setIsMobile] = useState(()=>typeof window!=="undefined"&&window.matchMedia("(max-width: 760px)").matches);\n  useEffect(()=>{const media=window.matchMedia("(max-width: 760px)");const update=()=>setIsMobile(media.matches);update();media.addEventListener("change",update);return()=>media.removeEventListener("change",update);},[]);
+  const [nodes,setNodes] = useState<TopologyNode[]>(readNodes);
+  const [isMobile,setIsMobile] = useState(()=>typeof window!=="undefined"&&window.matchMedia("(max-width: 760px)").matches);
+  useEffect(()=>{const media=window.matchMedia("(max-width: 760px)");const update=()=>setIsMobile(media.matches);update();media.addEventListener("change",update);return()=>media.removeEventListener("change",update);},[]);
   const [catalog] = useState<CatalogEntry[]>(readCatalog);
   const [selectedParent,setSelectedParent] = useState("");
   const [message,setMessage] = useState("");
@@ -110,6 +112,18 @@ function layoutGraph(nodes:TopologyNode[],vertical=false):{positions:Map<string,
  const children=new Map<string,TopologyNode[]>();
  for(const n of nodes)if(n.parentId&&byId.has(n.parentId)){const list=children.get(n.parentId)??[];list.push(n);children.set(n.parentId,list);}
  const positions=new Map<string,{x:number;y:number}>();let leaf=0;let maxDepth=0;
+ if(vertical){
+  let leafIndex=0;
+  const assign=(n:TopologyNode):number=>{
+   const kids=children.get(n.id)??[];let x:number;
+   if(kids.length){const xs=kids.map(assign);x=(Math.min(...xs)+Math.max(...xs))/2;}
+   else{x=95+leafIndex*190;leafIndex++;}
+   positions.set(n.id,{x,y:45+depth(n,nodes)*105});return x;
+  };
+  const roots=nodes.filter(n=>!n.parentId||!byId.has(n.parentId));roots.forEach(assign);
+  for(const n of nodes)if(!positions.has(n.id))positions.set(n.id,{x:95+leafIndex++*190,y:45+depth(n,nodes)*105});
+  return {positions,width:Math.max(300,leafIndex*190),height:Math.max(130,(Math.max(0,...nodes.map(n=>depth(n,nodes)))+1)*105+45)};
+ }
  const visit=(n:TopologyNode,d:number):number=>{
   maxDepth=Math.max(maxDepth,d);const kids=children.get(n.id)??[];let y:number;
   if(kids.length){const ys=kids.map(k=>visit(k,d+1));y=(Math.min(...ys)+Math.max(...ys))/2;}
