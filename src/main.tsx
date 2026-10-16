@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Activity, Archive, Cable, Download, GitBranch, Plus, RadioTower, Save, Trash2 } from "lucide-react";
 import CascadePlanner from "./CascadePlanner";
 import CatalogManager from "./CatalogManager";
+import SplitterCatalogSelect from "./SplitterCatalogSelect";
 import { calculateBudget, createId, LineElement, makeElement, OpticalProfile, TECHNOLOGY_PRESETS, Technology } from "./domain";
 import "./style.css";
 
@@ -59,7 +60,7 @@ function App() {
             <div className="table-head"><span>ТИП / КОМПОНЕНТ</span><span>КОЛ-ВО / ДЛИНА</span><span>ПАРАМЕТРЫ</span><span>ПОТЕРИ</span><span/></div>
             <div className="elements">
               {elements.map((e, i) => <div className="element-row" key={e.id}>
-                <div className="element-name"><span className="element-index">{String(i + 1).padStart(2,"0")}</span><div><strong>{e.label}</strong><small>{e.kind.toUpperCase()}</small></div></div>
+                <div className="element-name"><span className="element-index">{String(i + 1).padStart(2,"0")}</span><div className="element-title"><strong>{e.label}</strong><small>{e.kind.toUpperCase()}</small>{(e.kind === "plc" || e.kind === "fbt") && <SplitterCatalogSelect element={e} onChange={patch => update(e.id, patch)} />}</div></div>
                 <div className="number-field">{e.kind === "fiber" ? <><input aria-label="Длина волокна, км" type="number" min="0" step="0.1" value={e.lengthKm} onChange={ev => update(e.id,{lengthKm:Number(ev.target.value)})}/><small>км</small></> : <><input aria-label="Количество компонентов" type="number" min="0" value={e.quantity} onChange={ev => update(e.id,{quantity:Number(ev.target.value)})}/><small>шт.</small></>}</div>
                 <div className="number-field">{e.kind === "fiber" ? <><input aria-label="Затухание dB на км" type="number" min="0" step="0.01" value={e.attenuationDbPerKm} onChange={ev => update(e.id,{attenuationDbPerKm:Number(ev.target.value)})}/><small>dB/км</small></> : <><input aria-label="Потери компонента dB" type="number" min="0" step="0.1" value={e.insertionLossDb} onChange={ev => update(e.id,{insertionLossDb:Number(ev.target.value)})}/><small>dB/шт.</small></>}</div>
                 <strong className="loss">{fmt(e.kind === "fiber" ? e.lengthKm * e.attenuationDbPerKm : e.quantity * e.insertionLossDb)} dB</strong>
@@ -67,7 +68,7 @@ function App() {
               </div>)}
             </div>
             <div className="add-row"><span>Добавить элемент линии</span>{(["fiber","plc","fbt","splice","connector","other"] as const).map(k => <button key={k} onClick={() => setElements(xs => [...xs, makeElement(k)])}><Plus size={13}/>{({fiber:"Волокно",plc:"PLC",fbt:"FBT",splice:"Сварка",connector:"Коннектор",other:"Прочее"} as Record<string,string>)[k]}</button>)}</div>
-            <p className="footnote">Потери PLC/FBT задаются вручную для выбранного делителя. Для каскада добавьте каждый сплиттер отдельной строкой. Учитывайте длину волны, класс оптики, запас и паспортные значения.</p>
+            <p className="footnote">Для PLC и FBT можно выбрать модель из каталога: значение insertion loss подставится в расчёт автоматически. Если модель не выбрана, потери задаются вручную. Для каскада добавьте каждый сплиттер отдельной строкой и сверяйте значения с datasheet.</p>
           </section>
           <aside className="result-column">
             <section className="result-card"><div className="result-top"><span>ИТОГОВЫЙ БЮДЖЕТ</span><Activity size={18}/></div><div className="hero-metric">{fmt(result.rxPowerDbm)} <small>dBm</small></div><p>Расчётный уровень на приёмнике</p><div className={"status "+(result.withinSensitivity && result.withinOverload && result.designMarginDb >= 0 ? "good" : "warn")}>{result.status}</div><div className="metric-row"><span>Суммарные потери</span><strong>{fmt(result.totalLossDb)} dB</strong></div><div className="metric-row"><span>Запас до чувствительности</span><strong>{fmt(result.marginDb)} dB</strong></div><div className="metric-row"><span>Запас сверх проектного</span><strong>{fmt(result.designMarginDb)} dB</strong></div><div className="power-scale"><div className="scale-track"><span style={{left: Math.max(0,Math.min(100,(result.rxPowerDbm+35)/35*100))+"%"}}/></div><div><span>−35 dBm</span><span>0 dBm</span></div></div></section>
