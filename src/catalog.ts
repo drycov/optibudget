@@ -27,11 +27,11 @@ export const STARTER_CATALOG: CatalogItem[] = [
   {id:"corning-plc-1x64-rack",vendor:"Corning",model:"PLC 1x64 Rack Mount (CAH-106)",category:"PLC",technology:"PLC splitter · 1×64 · 1260–1650 nm · rack",...emptyOptics,insertionLossDb:21,sourceUrl:"https://www.corning.com/catalog/coc/documents/product-specifications/CAH-106-AEN.pdf",verifiedAt:"2026-10-16",dataStatus:"datasheet",notes:"Maximum insertion loss 21 dB для 1x64 rack-mount; не переносить это значение на другие корпуса/исполнения."},
   ...["Huawei","ZTE","Nokia","FiberHome","BDCOM","C-Data","VSOL","Dasan","Calix","Adtran","Zyxel","Raisecom","Eltex"].map((vendor,i)=>({
     id:`vendor-${i+1}`,vendor,model:"",category:"OLT" as const,technology:"GPON / EPON / зависит от модели",
-    ...emptyOptics,sourceUrl:"",verifiedAt:"",dataStatus:"template" as const,notes:"ШАБЛОН: укажите точную модель, порт/трансивер, класс оптики и значения из официального datasheet."
+    ...emptyOptics,txMinDbm:1.5,txMaxDbm:5,sourceUrl:"",verifiedAt:"",dataStatus:"template" as const,notes:"ШАБЛОН GPON B+ для предварительной оценки: TX диапазон 1.5…5 dBm. Это не паспорт конкретной модели; уточните класс, порт и трансивер."
   })),
   ...["Huawei","ZTE","Nokia","FiberHome","BDCOM","C-Data","VSOL","Dasan","Calix","Adtran","Zyxel","Raisecom","Eltex"].map((vendor,i)=>({
     id:`ont-${i+1}`,vendor,model:"",category:"ONT/ONU" as const,technology:"GPON / EPON / зависит от модели",
-    ...emptyOptics,sourceUrl:"",verifiedAt:"",dataStatus:"template" as const,notes:"ШАБЛОН: чувствительность/перегрузку RX и совместимость уточнить по datasheet конкретной ONT и OLT."
+    ...emptyOptics,txMinDbm:0.5,txMaxDbm:5,rxSensitivityDbm:-27,rxOverloadDbm:-8,sourceUrl:"",verifiedAt:"",dataStatus:"template" as const,notes:"ШАБЛОН GPON B+ для предварительной оценки: TX 0.5…5 dBm, RX sensitivity −27 dBm, overload −8 dBm. Не паспорт модели; подтвердите по datasheet ONT и OLT."
   })),
   ...["CommScope","Fujikura","Sumitomo Electric","Furukawa","FS"].map((vendor,i)=>({
     id:`passive-${i+1}`,vendor,model:"",category:"PLC" as const,technology:"Пассивная оптика · шаблон",
