@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "optibudget";
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const SHELL_CACHE = `${CACHE_PREFIX}-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `${CACHE_PREFIX}-runtime-${CACHE_VERSION}`;
 const APP_SHELL = ["/", "/index.html", "/manifest.webmanifest", "/icons/optibudget.svg"];
