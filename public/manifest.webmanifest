@@ -1,0 +1,11 @@
+{
+  "name": "OptiBudget — PON Calculator",
+  "short_name": "OptiBudget",
+  "description": "Расчёт оптического бюджета PON-линий и каскадов сплиттеров",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3f6fb",
+  "theme_color": "#0f172a",
+  "icons": []
+}
