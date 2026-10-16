@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Activity, Archive, Cable, Download, GitBranch, Plus, RadioTower, Save, Trash2 } from "lucide-react";
 import CascadePlanner from "./CascadePlanner";
+import CatalogManager from "./CatalogManager";
 import { calculateBudget, createId, LineElement, makeElement, OpticalProfile, TECHNOLOGY_PRESETS, Technology, VENDOR_CATALOG } from "./domain";
 import "./style.css";
 
@@ -76,7 +77,7 @@ function App() {
       </>}
       {tab === "topology" && <CascadePlanner />}
       {tab === "journal" && <section className="panel journal"><div className="panel-heading"><div><h2>Сохранённые расчёты</h2><p>Снимки конфигурации хранятся в браузере на этом устройстве.</p></div><button className="btn" onClick={exportJson}><Download size={15}/> Экспорт JSON</button></div>{journal.length === 0 ? <div className="empty">Расчётов пока нет. Сохраните расчёт на вкладке «Расчёт линии».</div> : journal.map(item => <div className="journal-item" key={item.id}><div><strong>{item.title}</strong><small>{new Date(item.createdAt).toLocaleString("ru-RU")} · {item.technology} · {item.elements.length} элементов</small></div><button className="btn" onClick={() => load(item)}>Открыть</button><button className="icon-btn" aria-label="Удалить расчёт" onClick={() => persist(journal.filter(x => x.id !== item.id))}><Trash2 size={15}/></button></div>)}</section>}
-      {tab === "catalog" && <section className="panel catalog"><div className="panel-heading"><div><h2>Стартовый каталог производителей</h2><p>Список для ориентира; конкретные модели и паспортные параметры добавляются отдельно.</p></div></div><div className="catalog-grid">{VENDOR_CATALOG.map(v => <div className="vendor-card" key={v.vendor}><strong>{v.vendor}</strong><span>{v.category}</span><small>{v.note}</small></div>)}</div><div className="warning">Не используйте стартовые параметры профилей как подтверждённые спецификации конкретного оборудования. Перед проектированием сверяйте TX, чувствительность, перегрузку и insertion loss с паспортами.</div></section>}
+      {tab === "catalog" && <CatalogManager />}
       <footer>OptiBudget MVP · расчёт инженерной оценки, не заменяет проверку проектных норм и datasheet компонентов.</footer>
     </main>
   </div>;
