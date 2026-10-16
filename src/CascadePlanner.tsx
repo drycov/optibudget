@@ -44,7 +44,7 @@ export default function CascadePlanner() {
     const item=catalog.find(x=>x.id===itemId);
     if(!item){patch(node.id,{catalogItemId:""});return;}
     const changes:Partial<TopologyNode>={catalogItemId:item.id};
-    if(node.kind==="olt"&&item.txMaxDbm!==null)changes.txDbm=item.txMaxDbm;
+    if(node.kind==="olt"&&item.txMinDbm!==null&&item.txMaxDbm!==null&&item.txMinDbm===item.txMaxDbm)changes.txDbm=item.txMaxDbm;
     if(node.kind==="ont"){
       if(item.rxSensitivityDbm!==null)changes.rxSensitivityDbm=item.rxSensitivityDbm;
       if(item.rxOverloadDbm!==null)changes.rxOverloadDbm=item.rxOverloadDbm;
@@ -73,7 +73,7 @@ export default function CascadePlanner() {
           {["plc","fbt","splice","connector"].includes(n.kind)&&<label>Потери, dB<input type="number" min="0" step="0.1" value={n.insertionLossDb} onChange={e=>patch(n.id,{insertionLossDb:Number(e.target.value)})}/></label>}
           {n.kind==="ont"&&<><label>Длина волны, nm<select value={n.wavelengthNm??1490} onChange={e=>patch(n.id,{wavelengthNm:Number(e.target.value)})}>{WAVELENGTHS_NM.map(w=><option key={w} value={w}>{w} nm</option>)}</select></label><label>Чувствительность RX, dBm<input type="number" step="0.1" value={n.rxSensitivityDbm??-28} onChange={e=>patch(n.id,{rxSensitivityDbm:Number(e.target.value)})}/></label><label>Перегрузка RX, dBm<input type="number" step="0.1" value={n.rxOverloadDbm??-8} onChange={e=>patch(n.id,{rxOverloadDbm:Number(e.target.value)})}/></label></>}
           {n.kind!=="ont"&&n.kind!=="olt"&&<label>Длина волны, nm<select value={n.wavelengthNm??1490} onChange={e=>patch(n.id,{wavelengthNm:Number(e.target.value)})}>{WAVELENGTHS_NM.map(w=><option key={w} value={w}>{w} nm</option>)}</select></label>}
-          {(n.kind==="olt"||n.kind==="ont"||["plc","fbt","splice","connector"].includes(n.kind))&&<label className="catalog-bind">Модель из каталога<select value={n.catalogItemId??""} onChange={e=>applyCatalog(n,e.target.value)}><option value="">Не привязана</option>{catalog.filter(x=>{const cats=n.kind==="olt"?["OLT"]:n.kind==="ont"?["ONT/ONU"]:n.kind==="plc"?["PLC"]:n.kind==="fbt"?["FBT"]:["Optical module"];return cats.includes(x.category)}).map(x=><option key={x.id} value={x.id}>{x.vendor} {x.model||"(модель не указана)"}</option>)}</select></label>}
+          {(n.kind==="olt"||n.kind==="ont"||n.kind==="plc"||n.kind==="fbt")&&<label className="catalog-bind">Модель из каталога<select value={n.catalogItemId??""} onChange={e=>applyCatalog(n,e.target.value)}><option value="">Не привязана</option>{catalog.filter(x=>{const cats=n.kind==="olt"?["OLT"]:n.kind==="ont"?["ONT/ONU"]:n.kind==="plc"?["PLC"]:["FBT"];return cats.includes(x.category)}).map(x=><option key={x.id} value={x.id}>{x.vendor} {x.model||"(модель не указана)"}</option>)}</select></label>}
           {n.kind!=="olt"&&<label>Подключён к<select value={n.parentId??""} onChange={e=>patch(n.id,{parentId:e.target.value||null})}>{nodes.filter(p=>p.kind!=="ont"&&p.id!==n.id&&!isDescendant(p.id,n.id,nodes)).map(p=><option key={p.id} value={p.id}>{p.name} · {NODE_LABELS[p.kind]}</option>)}</select></label>}
           </div><div className="node-loss">Потери элемента: <strong>{nfmt(n.kind==="fiber"?n.lengthKm*n.attenuationDbPerKm:n.insertionLossDb)} dB</strong></div>
         </article>)}</div>
