@@ -106,3 +106,11 @@ input,select,textarea{scroll-margin-bottom:100px}
  .nav-item,.nav-item.active{position:relative}
  .count{top:2px;right:calc(50% - 24px);transform:none}
 }
+
+.header-actions{display:flex;align-items:center;gap:8px;flex:none}
+.install-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;border:1px solid #2563eb;border-radius:8px;background:#2563eb;color:#fff;padding:8px 11px;font:inherit;font-size:11px;font-weight:650;cursor:pointer}
+.install-action:hover{background:#1d4ed8}
+.offline-state{color:#b45309;background:#fffbeb;border-color:#fde68a}
+.offline-state i{background:#f59e0b}
+@media(max-width:760px){.header-actions{gap:6px}.install-action{min-height:38px;padding:7px 9px;font-size:11px;border-radius:8px}.install-action svg{width:15px;height:15px}.topbar{align-items:flex-start}.offline{display:inline-flex;align-items:center;justify-content:center}}
+@media(max-width:380px){.install-action{padding:7px}.install-action span{font-size:10px}}
