@@ -15,7 +15,7 @@ const read=():CatalogItem[]=>{
  return STARTER_CATALOG.map(x=>({...x}));
 };
 const categories:CatalogItem["category"][]=["OLT","ONT/ONU","PLC","FBT","Optical module","Fiber"];
-const fields:[keyof CatalogItem,string][]=[["txMinDbm","TX min, dBm"],["txMaxDbm","TX max, dBm"],["rxSensitivityDbm","RX чувствительность, dBm"],["rxOverloadDbm","RX перегрузка, dBm"],["insertionLossDb","Insertion loss, dB"]];
+const fields:[keyof CatalogItem,string][]=[["txMinDbm","TX min, dBm"],["txMaxDbm","TX max, dBm"],["rxSensitivityDbm","RX чувствительность, dBm"],["rxOverloadDbm","RX перегрузка, dBm"],["insertionLossDb","Insertion loss, dB"],["attenuationDbPerKm","Затухание волокна, dB/км"]];
 export default function CatalogManager(){
  const [items,setItems]=useState<CatalogItem[]>(read);
  const [filter,setFilter]=useState("");
