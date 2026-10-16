@@ -9,13 +9,14 @@ export type CatalogItem = {
   rxSensitivityDbm: number | null;
   rxOverloadDbm: number | null;
   insertionLossDb: number | null;
+  attenuationDbPerKm: number | null;
   sourceUrl: string;
   verifiedAt: string;
   notes: string;
   dataStatus?: "datasheet" | "template";
 };
 const emptyOptics = {
-  txMinDbm:null,txMaxDbm:null,rxSensitivityDbm:null,rxOverloadDbm:null,insertionLossDb:null
+  txMinDbm:null,txMaxDbm:null,rxSensitivityDbm:null,rxOverloadDbm:null,insertionLossDb:null,attenuationDbPerKm:null
 };
 const corningSource = "https://www.corning.com/catalog/coc/documents/product-specifications/CRR-1060-AEN.pdf";
 export const STARTER_CATALOG: CatalogItem[] = [
@@ -36,7 +37,7 @@ export const STARTER_CATALOG: CatalogItem[] = [
     id:`passive-${i+1}`,vendor,model:"",category:"PLC" as const,technology:"Пассивная оптика · шаблон",
     ...emptyOptics,sourceUrl:"",verifiedAt:"",dataStatus:"template" as const,notes:"ШАБЛОН: заполнить модель, коэффициент деления, insertion loss, диапазон длин волн и ссылку на datasheet."
   })),
-  {id:"template-fiber-g652d",vendor:"Generic",model:"SMF G.652.D (template)",category:"Fiber",technology:"Одномодовое волокно · ориентир для предварительной оценки",...emptyOptics,sourceUrl:"",verifiedAt:"",dataStatus:"template",notes:"Шаблон: 0.35 dB/km — примерное проектное значение, НЕ паспорт конкретного кабеля. Измените по паспорту и длине волны."},
+  {id:"template-fiber-g652d",vendor:"Generic",model:"SMF G.652.D (template)",category:"Fiber",technology:"Одномодовое волокно · ориентир для предварительной оценки",...emptyOptics,attenuationDbPerKm:0.35,sourceUrl:"",verifiedAt:"",dataStatus:"template",notes:"Шаблон: 0.35 dB/km — примерное проектное значение, НЕ паспорт конкретного кабеля. Измените по паспорту и длине волны."},
   {id:"template-splice",vendor:"Generic",model:"Fusion splice (template)",category:"Optical module",technology:"Сварка волокна · шаблон",...emptyOptics,insertionLossDb:0.1,sourceUrl:"",verifiedAt:"",dataStatus:"template",notes:"Шаблонная оценка 0.1 dB на сварку; замените значением из норм проекта/измерений."},
   {id:"template-connector",vendor:"Generic",model:"Connector pair (template)",category:"Optical module",technology:"Пара оптических соединителей · шаблон",...emptyOptics,insertionLossDb:0.3,sourceUrl:"",verifiedAt:"",dataStatus:"template",notes:"Шаблонная оценка 0.3 dB на соединение; зависит от типа, чистоты и качества монтажа."}
 ];
