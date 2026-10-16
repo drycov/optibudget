@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Activity, Archive, Cable, Download, GitBranch, Plus, RadioTower, Save, Trash2 } from "lucide-react";
 import CascadePlanner from "./CascadePlanner";
@@ -11,6 +11,7 @@ type Saved = { id: string; title: string; createdAt: string; technology: Technol
 const KEY = "optibudget.journal.v1";
 const readJournal = (): Saved[] => { try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; } };
 const fmt = (n: number) => Number(n).toFixed(2);
+type InstallPromptEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }> };
 function App() {
   const [technology, setTechnology] = useState<Technology>("GPON");
   const [profile, setProfile] = useState<OpticalProfile>({ ...TECHNOLOGY_PRESETS.GPON });
@@ -19,6 +20,32 @@ function App() {
   const [journal, setJournal] = useState<Saved[]>(readJournal);
   const [tab, setTab] = useState<"calculator" | "journal" | "catalog" | "topology">("calculator");
   const [notice, setNotice] = useState("");
+  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  useEffect(() => {
+    const onInstallPrompt = (event: Event) => { event.preventDefault(); setInstallPrompt(event as InstallPromptEvent); };
+    const onInstalled = () => { setIsInstalled(true); setInstallPrompt(null); setNotice("OptiBudget установлен на устройство."); };
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    setIsInstalled(window.matchMedia("(display-mode: standalone)").matches || (("standalone" in navigator) && Boolean((navigator as Navigator & { standalone?: boolean }).standalone)));
+    window.addEventListener("beforeinstallprompt", onInstallPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    return () => { window.removeEventListener("beforeinstallprompt", onInstallPrompt); window.removeEventListener("appinstalled", onInstalled); window.removeEventListener("online", onOnline); window.removeEventListener("offline", onOffline); };
+  }, []);
+  async function installApp() {
+    if (installPrompt) {
+      await installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      if (choice.outcome === "accepted") setNotice("Установка запущена. После установки OptiBudget появится на главном экране.");
+      setInstallPrompt(null);
+      return;
+    }
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    setNotice(isIos ? "Чтобы установить приложение на iPhone/iPad: нажмите «Поделиться» в Safari, затем «На экран Домой»." : "Откройте меню браузера и выберите «Установить приложение» или «Добавить на главный экран». Для установки откройте сайт по HTTPS.");
+  }
   const result = useMemo(() => calculateBudget(profile, elements), [profile, elements]);
   function update(id: string, patch: Partial<LineElement>) { setElements(xs => xs.map(x => x.id === id ? { ...x, ...patch } : x)); }
   function changeTechnology(t: Technology) { setTechnology(t); setProfile({ ...TECHNOLOGY_PRESETS[t] }); }
@@ -43,7 +70,7 @@ function App() {
       <div className="side-note">PWA · локальная работа<br/><small>Параметры MVP требуют проверки по паспортам</small></div>
     </aside>
     <main className="main">
-      <header className="topbar"><div><div className="eyebrow">ОПТИЧЕСКОЕ ПРОЕКТИРОВАНИЕ / PON</div><h1>{tab === "calculator" ? "Расчёт оптического бюджета" : tab === "journal" ? "Журнал расчётов" : tab === "catalog" ? "Каталог оборудования" : "Каскадная топология"}</h1></div><span className="offline"><i/> Локальный режим</span></header>
+      <header className="topbar"><div><div className="eyebrow">ОПТИЧЕСКОЕ ПРОЕКТИРОВАНИЕ / PON</div><h1>{tab === "calculator" ? "Расчёт оптического бюджета" : tab === "journal" ? "Журнал расчётов" : tab === "catalog" ? "Каталог оборудования" : "Каскадная топология"}</h1></div><div className="header-actions"><span className={"offline " + (isOnline ? "" : "offline-state")}><i/> {isOnline ? "Онлайн" : "Офлайн"}</span>{!isInstalled && <button className="install-action" onClick={installApp}><Download size={15}/><span>Установить</span></button>}</div></header>
       {tab === "calculator" && <section className="mobile-summary" aria-live="polite"><div><span>Уровень RX</span><strong>{fmt(result.rxPowerDbm)} <small>dBm</small></strong></div><div><span>Потери</span><strong>{fmt(result.totalLossDb)} dB</strong></div><div className={result.withinSensitivity && result.withinOverload && result.designMarginDb >= 0 ? "mobile-summary-state good" : "mobile-summary-state warn"}>{result.status}</div></section>}
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
       {tab === "calculator" && <>
