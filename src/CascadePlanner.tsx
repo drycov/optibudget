@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Plus, Trash2, Download, Cable, GitBranch } from "lucide-react";
 import { calculateTopology, makeTopologyNode, NODE_LABELS, NodeKind, TopologyNode, OPTICAL_CLASS_BUDGET_DB, OpticalClass, WAVELENGTHS_NM, nodeLoss } from "./cascade";
 import { CatalogItem, STARTER_CATALOG } from "./catalog";
@@ -25,7 +25,7 @@ const readNodes = (): TopologyNode[] => {
 const nfmt = (n:number) => Number.isFinite(n) ? n.toFixed(2) : "—";
 const kinds: NodeKind[] = ["fiber","plc","fbt","splice","connector","ont"];
 export default function CascadePlanner() {
-  const [nodes,setNodes] = useState<TopologyNode[]>(readNodes);
+  const [nodes,setNodes] = useState<TopologyNode[]>(readNodes);\n  const [isMobile,setIsMobile] = useState(()=>typeof window!=="undefined"&&window.matchMedia("(max-width: 760px)").matches);\n  useEffect(()=>{const media=window.matchMedia("(max-width: 760px)");const update=()=>setIsMobile(media.matches);update();media.addEventListener("change",update);return()=>media.removeEventListener("change",update);},[]);
   const [catalog] = useState<CatalogEntry[]>(readCatalog);
   const [selectedParent,setSelectedParent] = useState("");
   const [message,setMessage] = useState("");
@@ -68,7 +68,7 @@ export default function CascadePlanner() {
     const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="optibudget-ont-report.csv";a.click();URL.revokeObjectURL(url);
   }
   const ordered = [...nodes].sort((a,b)=>depth(a,nodes)-depth(b,nodes));
-  const diagram = layoutGraph(nodes);
+  const diagram = layoutGraph(nodes,isMobile);
   const resultByNode = new Map(results.map(r=>[r.node.id,r]));
   return <div className="cascade-workspace">
     <div className="cascade-intro"><div className="cascade-icon"><GitBranch size={20}/></div><div><h2>Каскадная топология PON</h2><p>Создавайте разветвлённую схему OLT → волокно → PLC/FBT → абонентские ветки → ONT/ONU. Расчёт выполняется отдельно по пути каждого терминала.</p></div><div className="topology-report-actions"><button className="btn" onClick={exportTopology}><Download size={15}/> JSON</button><button className="btn" onClick={exportReportCsv}><Download size={15}/> Отчёт CSV</button><button className="btn" onClick={()=>window.print()}>Печать / PDF</button></div></div>
@@ -105,7 +105,7 @@ export default function CascadePlanner() {
     </div>
   </div>;
 }
-function layoutGraph(nodes:TopologyNode[]):{positions:Map<string,{x:number;y:number}>;width:number;height:number}{
+function layoutGraph(nodes:TopologyNode[],vertical=false):{positions:Map<string,{x:number;y:number}>;width:number;height:number}{
  const byId=new Map(nodes.map(n=>[n.id,n]));
  const children=new Map<string,TopologyNode[]>();
  for(const n of nodes)if(n.parentId&&byId.has(n.parentId)){const list=children.get(n.parentId)??[];list.push(n);children.set(n.parentId,list);}
