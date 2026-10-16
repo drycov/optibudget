@@ -101,3 +101,8 @@ input,select,textarea{scroll-margin-bottom:100px}
   .nav-text{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+@media(max-width:760px){
+ .nav-item,.nav-item.active{position:relative}
+ .count{top:2px;right:calc(50% - 24px);transform:none}
+}
