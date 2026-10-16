@@ -60,8 +60,18 @@ export default function CascadePlanner() {
     const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const a=document.createElement("a");a.href=url;a.download="optibudget-ont-report.csv";a.click();URL.revokeObjectURL(url);
   }
   const ordered = [...nodes].sort((a,b)=>depth(a,nodes)-depth(b,nodes));
+  const diagram = layoutGraph(nodes);
+  const resultByNode = new Map(results.map(r=>[r.node.id,r]));
   return <div className="cascade-workspace">
     <div className="cascade-intro"><div className="cascade-icon"><GitBranch size={20}/></div><div><h2>Каскадная топология PON</h2><p>Создавайте разветвлённую схему OLT → волокно → PLC/FBT → абонентские ветки → ONT/ONU. Расчёт выполняется отдельно по пути каждого терминала.</p></div><div className="topology-report-actions"><button className="btn" onClick={exportTopology}><Download size={15}/> JSON</button><button className="btn" onClick={exportReportCsv}><Download size={15}/> Отчёт CSV</button><button className="btn" onClick={()=>window.print()}>Печать / PDF</button></div></div>
+    <section className="panel topology-visual"><div className="panel-heading"><div><h2>Визуальная схема каскада</h2><p>Связи по parent node; положение узлов рассчитывается автоматически. Прокручивайте схему по горизонтали на широких топологиях.</p></div><span className="step">{nodes.length} узлов</span></div>
+      {nodes.length===0?<div className="empty">Добавьте OLT, чтобы начать строить схему.</div>:<div className="topology-canvas"><svg role="img" aria-label="Графическая схема PON-топологии" viewBox={`0 0 ${diagram.width} ${diagram.height}`} width={diagram.width} height={diagram.height}>
+        <defs><marker id="topology-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#9aa9bc"/></marker></defs>
+        {nodes.filter(n=>n.parentId&&diagram.positions.has(n.parentId)&&diagram.positions.has(n.id)).map(n=>{const p=diagram.positions.get(n.parentId!)!;const q=diagram.positions.get(n.id)!;return <g key={`edge-${n.id}`}><path d={`M ${p.x+76} ${p.y} C ${p.x+125} ${p.y}, ${q.x-55} ${q.y}, ${q.x-12} ${q.y}`} fill="none" stroke="#9aa9bc" strokeWidth="2" markerEnd="url(#topology-arrow)"/><text x={(p.x+q.x)/2+8} y={(p.y+q.y)/2-7} fontSize="10" fill="#7b8799">{n.kind==="fiber"?n.lengthKm+" km":n.kind==="ont"?"":n.insertionLossDb+" dB"}</text></g>})}
+        {nodes.map(n=>{const p=diagram.positions.get(n.id)!;const r=resultByNode.get(n.id);const color=n.kind==="olt"?"#2563eb":n.kind==="ont"?"#059669":n.kind==="plc"||n.kind==="fbt"?"#7c3aed":"#64748b";return <g key={n.id}><rect x={p.x-76} y={p.y-27} width="152" height="54" rx="9" fill="#fff" stroke={color} strokeWidth="2"/><circle cx={p.x-61} cy={p.y-10} r="4" fill={color}/><text x={p.x-50} y={p.y-8} fontSize="10" fontWeight="600" fill="#263449">{n.name.length>18?n.name.slice(0,17)+"…":n.name}</text><text x={p.x-61} y={p.y+10} fontSize="9" fill="#718096">{NODE_LABELS[n.kind]}</text><text x={p.x-61} y={p.y+21} fontSize="9" fontWeight="600" fill={r&&r.rxDbm< -28?"#dc2626":"#475569"}>{r?`RX ${nfmt(r.rxDbm)} dBm`:n.kind==="fiber"?`${n.lengthKm} km · ${nfmt(nodeLoss(n))} dB`:n.kind==="olt"?`TX ${nfmt(n.txDbm??5)} dBm`:`${nfmt(nodeLoss(n))} dB`}</text></g>})}
+      </svg></div>}
+      <div className="topology-legend"><span><i className="legend-olt"/>OLT</span><span><i className="legend-splitter"/>PLC/FBT</span><span><i className="legend-ont"/>ONT/ONU</span><span><i className="legend-other"/>Волокно и компоненты</span></div>
+    </section>
     <div className="cascade-grid">
       <section className="panel cascade-editor">
         <div className="panel-heading"><div><h2>Узлы и соединения</h2><p>У каждого элемента, кроме OLT, выбран родительский узел.</p></div><Cable size={18}/></div>
@@ -86,6 +96,22 @@ export default function CascadePlanner() {
       </aside>
     </div>
   </div>;
+}
+function layoutGraph(nodes:TopologyNode[]):{positions:Map<string,{x:number;y:number}>;width:number;height:number}{
+ const byId=new Map(nodes.map(n=>[n.id,n]));
+ const children=new Map<string,TopologyNode[]>();
+ for(const n of nodes)if(n.parentId&&byId.has(n.parentId)){const list=children.get(n.parentId)??[];list.push(n);children.set(n.parentId,list);}
+ const positions=new Map<string,{x:number;y:number}>();let leaf=0;let maxDepth=0;
+ const visit=(n:TopologyNode,d:number):number=>{
+  maxDepth=Math.max(maxDepth,d);const kids=children.get(n.id)??[];let y:number;
+  if(kids.length){const ys=kids.map(k=>visit(k,d+1));y=(Math.min(...ys)+Math.max(...ys))/2;}
+  else{y=45+leaf*100;leaf++;}
+  positions.set(n.id,{x:100+d*220,y});return y;
+ };
+ const roots=nodes.filter(n=>!n.parentId||!byId.has(n.parentId));
+ roots.forEach(n=>visit(n,0));
+ for(const n of nodes)if(!positions.has(n.id)){positions.set(n.id,{x:100+depth(n,nodes)*220,y:45+leaf*100});leaf++;}
+ return {positions,width:Math.max(280,(maxDepth+1)*220),height:Math.max(130,leaf*100+20)};
 }
 function depth(node:TopologyNode,nodes:TopologyNode[]):number { const byId=new Map(nodes.map(n=>[n.id,n])); let d=0,cur=node,seen=new Set<string>(); while(cur.parentId&&!seen.has(cur.id)){seen.add(cur.id);const p=byId.get(cur.parentId);if(!p)break;cur=p;d++;}return d; }
 function nodeIndent(node:TopologyNode,nodes:TopologyNode[]):string { return "　".repeat(Math.min(6,depth(node,nodes))) }
