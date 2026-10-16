@@ -34,3 +34,18 @@ test("topology UI binds equipment and exports per-ONT reports", () => {
   assert.match(planner, /optibudget-ont-report\.csv/);
   assert.match(planner, /window\.print\(\)/);
 });
+
+test("catalog seeds published Corning PLC insertion-loss values and keeps generic specs marked as templates", () => {
+  const seed = readFileSync(new URL("../src/catalog.ts", import.meta.url), "utf8");
+  assert.match(seed, /corning-plc-1x8/);
+  assert.match(seed, /insertionLossDb:10\.5/);
+  assert.match(seed, /CRR-1060-AEN\.pdf/);
+  assert.match(seed, /dataStatus:"template"/);
+  assert.match(seed, /attenuationDbPerKm/);
+});
+test("topology renders a graph with parent-child links and node-level results", () => {
+  assert.match(planner, /Визуальная схема каскада/);
+  assert.match(planner, /role="img" aria-label="Графическая схема PON-топологии"/);
+  assert.match(planner, /markerEnd="url\(#topology-arrow\)"/);
+  assert.match(planner, /layoutGraph\(nodes\)/);
+});
