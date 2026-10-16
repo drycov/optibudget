@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { Activity, Archive, Cable, Download, GitBranch, Plus, RadioTower, Save, Trash2 } from "lucide-react";
 import CascadePlanner from "./CascadePlanner";
 import CatalogManager from "./CatalogManager";
-import { calculateBudget, createId, LineElement, makeElement, OpticalProfile, TECHNOLOGY_PRESETS, Technology, VENDOR_CATALOG } from "./domain";
+import { calculateBudget, createId, LineElement, makeElement, OpticalProfile, TECHNOLOGY_PRESETS, Technology } from "./domain";
 import "./style.css";
 
 type Saved = { id: string; title: string; createdAt: string; technology: Technology; profile: OpticalProfile; elements: LineElement[] };
