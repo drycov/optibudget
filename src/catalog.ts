@@ -34,6 +34,26 @@ export const STARTER_CATALOG: CatalogItem[] = [
   {id:"corning-plc-2x32",vendor:"Corning",model:"PLC 2x32 (CRR-1060)",category:"PLC",technology:"PLC splitter · 2×32 · 1260–1650 nm",...emptyOptics,insertionLossDb:17.4,sourceUrl:corningSource,verifiedAt:"2026-10-16",dataStatus:"datasheet",notes:"Insertion loss 17.4 dB по таблице PLC Specifications (2x32)."},
   {id:"corning-plc-2x64",vendor:"Corning",model:"PLC 2x64 (product bulletin)",category:"PLC",technology:"PLC splitter · 2×64 · bare module",...emptyOptics,insertionLossDb:20.5,sourceUrl:"https://www.mdfmarketing.co.th/uploads/5277/files/Product/corning%20PLC%20Product%20Bulletin_03_04_2014.pdf",verifiedAt:"2026-10-16",dataStatus:"datasheet",notes:"Максимальные потери 20.5 dB по таблице Corning PLC Product Bulletin; сверить конкретную версию изделия."},
   ...[
+    {ratio:"80/20",low:2.6,high:8.0,range:"7–9"},
+    {ratio:"85/15",low:2.1,high:9.0,range:"8–10"},
+    {ratio:"90/10",low:1.8,high:10.5,range:"9–12"}
+  ].map(({ratio,low,high,range})=>({id:`template-plc-asym-${ratio.replace("/","-")}`,vendor:"Generic",model:`PLC 1x2 ${ratio} asymmetric (template)`,category:"PLC" as const,technology:`PLC asymmetric splitter · 1×2 · split ratio ${ratio} · 1260–1650 nm`,...emptyOptics,insertionLossDb:high,sourceUrl:"https://www.sqs-fiberoptics.com/data/files/Splittery/PLC-Asymmetrical-Splitters-r0.pdf",verifiedAt:"",dataStatus:"template" as const,notes:`Неравномерный PLC 1×2. Потери портов в справочном листе указаны как приблизительно ${low} dB на малопотерном выходе и ${range} dB на высокопотерном выходе (зависит от конкретной спецификации). Для консервативного расчёта insertionLossDb установлен в ${high} dB; проверяйте паспорт выбранного изделия.`})),
+  ...[
+    {ratio:"45/55",a:4.2,b:3.2},
+    {ratio:"40/60",a:4.7,b:2.7},
+    {ratio:"35/65",a:5.4,b:2.4},
+    {ratio:"33/67",a:5.7,b:2.2},
+    {ratio:"30/70",a:6.0,b:1.9},
+    {ratio:"25/75",a:7.0,b:1.7},
+    {ratio:"20/80",a:7.9,b:1.3},
+    {ratio:"15/85",a:9.5,b:1.0},
+    {ratio:"10/90",a:11.2,b:0.75},
+    {ratio:"5/95",a:14.15,b:0.4},
+    {ratio:"3/97",a:16.5,b:0.35},
+    {ratio:"2/98",a:18.45,b:0.3},
+    {ratio:"1/99",a:21.6,b:0.25}
+  ].map(({ratio,a,b})=>({id:`template-fbt-asym-${ratio.replace("/","-")}`,vendor:"Generic",model:`FBT 1x2 ${ratio} asymmetric (template)`,category:"FBT" as const,technology:`FBT asymmetric coupler · 1×2 · split ratio ${ratio} · 1310/1490/1550 nm (model dependent)`,...emptyOptics,insertionLossDb:Math.max(a,b),sourceUrl:"https://www.hirundo-link.com/product/sp/FBTCoupler.html",verifiedAt:"",dataStatus:"template" as const,notes:`Неравномерный FBT 1×2, потери выходов ориентировочно ${a}/${b} dB (Grade P table; значения зависят от класса и длины волны). В поле insertionLossDb указана большая потеря для консервативной оценки; точный расчёт каждого выхода требует паспорта и назначения портов.`})),
+  ...[
     {ratio:"1x3",ports:"1×3",loss:5.3},
     {ratio:"1x4",ports:"1×4",loss:6.8},
     {ratio:"1x8",ports:"1×8",loss:10.0},
