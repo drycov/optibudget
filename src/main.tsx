@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Activity, Archive, Cable, Download, Plus, RadioTower, Save, Trash2 } from "lucide-react";
+import { Activity, Archive, Cable, Download, GitBranch, Plus, RadioTower, Save, Trash2 } from "lucide-react";
+import CascadePlanner from "./CascadePlanner";
 import { calculateBudget, createId, LineElement, makeElement, OpticalProfile, TECHNOLOGY_PRESETS, Technology, VENDOR_CATALOG } from "./domain";
 import "./style.css";
 
@@ -14,7 +15,7 @@ function App() {
   const [title, setTitle] = useState("Новый расчёт GPON");
   const [elements, setElements] = useState<LineElement[]>([makeElement("fiber"), makeElement("plc"), makeElement("splice"), makeElement("connector")]);
   const [journal, setJournal] = useState<Saved[]>(readJournal);
-  const [tab, setTab] = useState<"calculator" | "journal" | "catalog">("calculator");
+  const [tab, setTab] = useState<"calculator" | "journal" | "catalog" | "topology">("calculator");
   const [notice, setNotice] = useState("");
   const result = useMemo(() => calculateBudget(profile, elements), [profile, elements]);
   function update(id: string, patch: Partial<LineElement>) { setElements(xs => xs.map(x => x.id === id ? { ...x, ...patch } : x)); }
@@ -36,10 +37,11 @@ function App() {
       <button className={tab === "calculator" ? "nav-item active" : "nav-item"} onClick={() => setTab("calculator")}><Activity size={18}/> Расчёт линии</button>
       <button className={tab === "journal" ? "nav-item active" : "nav-item"} onClick={() => setTab("journal")}><Archive size={18}/> Журнал <span className="count">{journal.length}</span></button>
       <button className={tab === "catalog" ? "nav-item active" : "nav-item"} onClick={() => setTab("catalog")}><RadioTower size={18}/> Каталог</button>
+      <button className={tab === "topology" ? "nav-item active" : "nav-item"} onClick={() => setTab("topology")}><GitBranch size={18}/> Каскад</button>
       <div className="side-note">PWA · локальная работа<br/><small>Параметры MVP требуют проверки по паспортам</small></div>
     </aside>
     <main className="main">
-      <header className="topbar"><div><div className="eyebrow">ОПТИЧЕСКОЕ ПРОЕКТИРОВАНИЕ / PON</div><h1>{tab === "calculator" ? "Расчёт оптического бюджета" : tab === "journal" ? "Журнал расчётов" : "Каталог оборудования"}</h1></div><span className="offline"><i/> Локальный режим</span></header>
+      <header className="topbar"><div><div className="eyebrow">ОПТИЧЕСКОЕ ПРОЕКТИРОВАНИЕ / PON</div><h1>{tab === "calculator" ? "Расчёт оптического бюджета" : tab === "journal" ? "Журнал расчётов" : tab === "catalog" ? "Каталог оборудования" : "Каскадная топология"}</h1></div><span className="offline"><i/> Локальный режим</span></header>
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
       {tab === "calculator" && <>
         <section className="project-strip">
@@ -72,6 +74,7 @@ function App() {
           </aside>
         </div>
       </>}
+      {tab === "topology" && <CascadePlanner />}
       {tab === "journal" && <section className="panel journal"><div className="panel-heading"><div><h2>Сохранённые расчёты</h2><p>Снимки конфигурации хранятся в браузере на этом устройстве.</p></div><button className="btn" onClick={exportJson}><Download size={15}/> Экспорт JSON</button></div>{journal.length === 0 ? <div className="empty">Расчётов пока нет. Сохраните расчёт на вкладке «Расчёт линии».</div> : journal.map(item => <div className="journal-item" key={item.id}><div><strong>{item.title}</strong><small>{new Date(item.createdAt).toLocaleString("ru-RU")} · {item.technology} · {item.elements.length} элементов</small></div><button className="btn" onClick={() => load(item)}>Открыть</button><button className="icon-btn" aria-label="Удалить расчёт" onClick={() => persist(journal.filter(x => x.id !== item.id))}><Trash2 size={15}/></button></div>)}</section>}
       {tab === "catalog" && <section className="panel catalog"><div className="panel-heading"><div><h2>Стартовый каталог производителей</h2><p>Список для ориентира; конкретные модели и паспортные параметры добавляются отдельно.</p></div></div><div className="catalog-grid">{VENDOR_CATALOG.map(v => <div className="vendor-card" key={v.vendor}><strong>{v.vendor}</strong><span>{v.category}</span><small>{v.note}</small></div>)}</div><div className="warning">Не используйте стартовые параметры профилей как подтверждённые спецификации конкретного оборудования. Перед проектированием сверяйте TX, чувствительность, перегрузку и insertion loss с паспортами.</div></section>}
       <footer>OptiBudget MVP · расчёт инженерной оценки, не заменяет проверку проектных норм и datasheet компонентов.</footer>
