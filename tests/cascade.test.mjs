@@ -49,3 +49,10 @@ test("topology renders a graph with parent-child links and node-level results", 
   assert.match(planner, /markerEnd="url\(#topology-arrow\)"/);
   assert.match(planner, /layoutGraph\(nodes\)/);
 });
+
+test("GPON B+ template values are labeled as illustrative and editable", () => {
+  const seed = readFileSync(new URL("../src/catalog.ts", import.meta.url), "utf8");
+  assert.match(seed, /txMinDbm:1\.5,txMaxDbm:5/);
+  assert.match(seed, /rxSensitivityDbm:-27,rxOverloadDbm:-8/);
+  assert.match(seed, /ШАБЛОН GPON B\+/);
+});
