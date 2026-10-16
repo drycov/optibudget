@@ -4,6 +4,7 @@ export type LineElement = {
   id: string;
   kind: ElementKind;
   label: string;
+  catalogItemId?: string;
   quantity: number;
   lengthKm: number;
   attenuationDbPerKm: number;
