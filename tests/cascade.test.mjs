@@ -56,3 +56,12 @@ test("GPON B+ template values are labeled as illustrative and editable", () => {
   assert.match(seed, /rxSensitivityDbm:-27,rxOverloadDbm:-8/);
   assert.match(seed, /ШАБЛОН GPON B\+/);
 });
+
+test("equipment catalog is presented as a table with a separate edit dialog", () => {
+  assert.match(catalog, /className="catalog-table"/);
+  assert.match(catalog, /className="catalog-modal"/);
+  assert.match(catalog, /role="dialog" aria-modal="true"/);
+  assert.match(catalog, /Редактирование модели/);
+  assert.match(catalog, /Добавить модель/);
+  assert.match(catalog, /Применить/);
+});
