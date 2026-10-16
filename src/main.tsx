@@ -44,7 +44,7 @@ function App() {
     </aside>
     <main className="main">
       <header className="topbar"><div><div className="eyebrow">ОПТИЧЕСКОЕ ПРОЕКТИРОВАНИЕ / PON</div><h1>{tab === "calculator" ? "Расчёт оптического бюджета" : tab === "journal" ? "Журнал расчётов" : tab === "catalog" ? "Каталог оборудования" : "Каскадная топология"}</h1></div><span className="offline"><i/> Локальный режим</span></header>
-      <section className="mobile-summary" aria-live="polite"><div><span>Уровень RX</span><strong>{fmt(result.rxPowerDbm)} <small>dBm</small></strong></div><div><span>Потери</span><strong>{fmt(result.totalLossDb)} dB</strong></div><div className={result.withinSensitivity && result.withinOverload && result.designMarginDb >= 0 ? "mobile-summary-state good" : "mobile-summary-state warn"}>{result.status}</div></section>
+      {tab === "calculator" && <section className="mobile-summary" aria-live="polite"><div><span>Уровень RX</span><strong>{fmt(result.rxPowerDbm)} <small>dBm</small></strong></div><div><span>Потери</span><strong>{fmt(result.totalLossDb)} dB</strong></div><div className={result.withinSensitivity && result.withinOverload && result.designMarginDb >= 0 ? "mobile-summary-state good" : "mobile-summary-state warn"}>{result.status}</div></section>}
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")}>×</button></div>}
       {tab === "calculator" && <>
         <section className="project-strip">
