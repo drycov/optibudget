@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const geo = readFileSync(new URL("../src/geo.ts", import.meta.url), "utf8");
 const mapUi = readFileSync(new URL("../src/MapPlanner.tsx", import.meta.url), "utf8");
+const mapBind = readFileSync(new URL("../src/mapAutoBind.ts", import.meta.url), "utf8");
 const supabase = readFileSync(new URL("../src/supabase.ts", import.meta.url), "utf8");
 const schema = readFileSync(new URL("../supabase/schema.sql", import.meta.url), "utf8");
 
@@ -14,18 +15,20 @@ test("geo module exports haversine and slack helpers", () => {
   assert.match(geo, /DEFAULT_MAP_CENTER/);
 });
 
-test("map planner draws routes and binds length to cascade fiber nodes", () => {
-  assert.match(mapUi, /MapContainer/);
-  assert.match(mapUi, /optibudget\.map\.v1/);
-  assert.match(mapUi, /applyLengthToNode/);
-  assert.match(mapUi, /optibudget\.topology\.v1/);
-  assert.match(mapUi, /GeoJSON/);
+test("map auto-bind logic binds multiple routes and can create fiber nodes", () => {
+  assert.match(mapBind, /autoBindRoutesToCascade/);
+  assert.match(mapBind, /fiberNodesOrdered/);
+  assert.match(mapBind, /makeTopologyNode\("fiber"/);
+  assert.match(mapBind, /lengthByNode/);
 });
 
-test("map auto-binds multiple routes to cascade fibers", () => {
+test("map planner UI wires auto-bind and storage keys", () => {
+  assert.match(mapUi, /MapContainer/);
+  assert.match(mapUi, /optibudget\.map\.v1/);
+  assert.match(mapUi, /optibudget\.topology\.v1/);
   assert.match(mapUi, /autoBindRoutesToCascade/);
   assert.match(mapUi, /Автопривязка всех/);
-  assert.match(mapUi, /makeTopologyNode\("fiber"/);
+  assert.match(mapUi, /GeoJSON/);
 });
 
 test("supabase client and project CRUD are present", () => {
