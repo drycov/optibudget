@@ -22,6 +22,12 @@ test("map planner draws routes and binds length to cascade fiber nodes", () => {
   assert.match(mapUi, /GeoJSON/);
 });
 
+test("map auto-binds multiple routes to cascade fibers", () => {
+  assert.match(mapUi, /autoBindRoutesToCascade/);
+  assert.match(mapUi, /Автопривязка всех/);
+  assert.match(mapUi, /makeTopologyNode\("fiber"/);
+});
+
 test("supabase client and project CRUD are present", () => {
   assert.match(supabase, /@supabase\/supabase-js/);
   assert.match(supabase, /saveProject/);
