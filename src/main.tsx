@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Activity, Archive, Cable, Cloud, Download, GitBranch, MapPin, Plus, RadioTower, Save, Trash2 } from "lucide-react";
-import { applyTelegramTheme } from "@drycov/design-kit";
-import "@drycov/design-kit/css";
+import { applyTelegramTheme } from "./vendor/design-kit";
+import "./vendor/design-kit/css/index.css";
 import CascadePlanner from "./CascadePlanner";
 import CatalogManager from "./CatalogManager";
 import SplitterCatalogSelect from "./SplitterCatalogSelect";

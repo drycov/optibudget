@@ -1,12 +1,12 @@
 # Design kit
 
-OptiBudget uses **[@drycov/design-kit](https://github.com/drycov/design-kit)**.
+OptiBudget uses a **vendored** copy of [@drycov/design-kit](https://github.com/drycov/design-kit) under `src/vendor/design-kit/`.
 
-```bash
-npm install
-npm run dev
+This avoids CI/Vercel failures when resolving `github:drycov/design-kit` as an npm dependency (TS2307).
+
+```ts
+import { applyTelegramTheme } from "./vendor/design-kit";
+import "./vendor/design-kit/css/index.css";
 ```
 
-- CSS: `import '@drycov/design-kit/css'` in `src/main.tsx`
-- Theme: `applyTelegramTheme()` + `html[data-tg-theme]`
-- Product styles (`style.css`, `cascade.css`, `catalog.css`, `map.css`) bind to `--tg-*` tokens
+Keep tokens in sync with the upstream repo when the platform palette changes.
